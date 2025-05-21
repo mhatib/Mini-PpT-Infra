@@ -6,9 +6,6 @@ Tested on Vagrant 2.3.4 and Virtualbox 7.0.8.
 Recommended Reading:
 1. [Vagrant Documentation](https://developer.hashicorp.com/vagrant/docs)
 
-# Network Diagram
-<img title="Network Diagram" alt="Alt text" src="/Images/network_diagram.png">
-
 # Developer Setup
 ## Installing Vagrant and Virtualbox
 This project needs to have both Vagrant 2.3.4 and Virtualbox 7.0.8 installed to run.
