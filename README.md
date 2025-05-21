@@ -24,8 +24,8 @@ powershell -ep bypass
 .\host_settings.ps1
 .\download_files.ps1
 
-## computer will restart after running the script
-## when restart is complete, run this in an administrator prompt
+computer will restart after running the script, when restart is complete, run this in an administrator prompt
+
 vagrant up
 
 It takes around 10 minutes to download all VMs and run properly. 
