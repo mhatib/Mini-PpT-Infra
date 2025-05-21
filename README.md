@@ -16,15 +16,14 @@ This project needs to have both Vagrant 2.3.4 and Virtualbox 7.0.8 installed to 
 At least 24GB of RAM and 100GB of disk space is required for all 6 machines to run smoothly with configurations specified in this repository. The resources used for each machine can be edited in `Vagrantfile` if needed.
 
 ## Set Up
-Run the following commands to create the environment: 
+Run the following commands in powershell (admin) to create the environment: 
 
-powershell (admin)
-powershell -ep bypass
-.\install_vagrant_virtualbox.ps1
-.\host_settings.ps1
-.\download_files.ps1
+powershell -ep bypass\
+.\install_vagrant_virtualbox.ps1\
+.\host_settings.ps1\
+.\download_files.ps1\
 
-computer will restart after running the script, when restart is complete, run this in an administrator prompt
+Your computer needs to restart after running the script, when restart is complete, run this in an administrator prompt
 
 vagrant up
 
