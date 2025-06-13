@@ -18,14 +18,16 @@ At least 24GB of RAM and 100GB of disk space is required for all 6 machines to r
 ## Set Up
 Run the following commands in powershell (admin) to create the environment: 
 
+```
 powershell -ep bypass\
 .\install_vagrant_virtualbox.ps1\
 .\host_settings.ps1\
 .\download_files.ps1\
+```
 
 Your computer needs to restart after running the script, when restart is complete, run this in an administrator prompt
 
-vagrant up
+`vagrant box add hashicorp/bionic64 && vagrant box add gusztavvargadr/windows-10 && vagrant up`
 
 It takes around 10 minutes to download all VMs and run properly. 
 
