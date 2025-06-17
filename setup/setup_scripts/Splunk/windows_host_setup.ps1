@@ -112,24 +112,26 @@ try {
     exit 1
 }
 
-# --- Install Cursor EXE ---
+# --- Manual Cursor Installation ---
 $exePath = "C:\Users\Public\cursor.exe"
 
-try {
-    Write-Host "Installing Cursor from $exePath"
-    Start-Process -FilePath $exePath `
-                  -ArgumentList "/silent", "/norestart" `
-                  -Wait -NoNewWindow
-
-    if ($LASTEXITCODE -ne 0) {
-        Write-Error "Cursor installer failed with exit code $LASTEXITCODE."
-        exit $LASTEXITCODE
-    }
-    Write-Host "[+] Cursor installed successfully."
-} catch {
-    Write-Error "Cursor installation failed: $_"
+if (-not (Test-Path $exePath)) {
+    Write-Error "Cursor installer not found at $exePath"
     exit 1
 }
+
+Write-Host "`n[!] Manual action required:"
+Write-Host "    -> Launching the cursor installer..."
+Write-Host "    -> Please follow the on-screen steps to complete the installation."
+Write-Host "    -> After completing the installation, return here and press Enter to continue."
+
+# Launch the installer (user handles it)
+Start-Process -FilePath $exePath
+
+# Wait for user confirmation
+Read-Host "`nPress Enter once the cursor installation is finished"
+
+Write-Host "[+] Continuing setup..."
 
 # --- Set Administrator Password ---
 try {

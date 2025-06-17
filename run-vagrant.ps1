@@ -57,29 +57,18 @@ Push-Location $scriptDir
 
 & vagrant up
 
-if (Ensure-AllVMsRunning) {
-Write-Host "[+] All VMs started successfully."
-MarkStepCompleted "vagrant_up_done"
-} else {
-Write-Warning "`n[!] One or more VMs did not start successfully."
-Write-Host " - You can troubleshoot using: 'vagrant status' or 'vagrant reload --provision'"
-Write-Host " - Re-run this script after resolving the issue."
-exit 1
+# 4. Vagrant Up
+Write-Host "`n[+] Starting Vagrant environment..."
+Push-Location $scriptDir
+
+# Run vagrant up and capture any errors
+try {
+    & vagrant up
+} catch {
+    Write-Error "[!] Error running 'vagrant up': $($_.Exception.Message)"
+    exit 1
 }
 
-Pop-Location
-} else {
-# If previously marked done, still verify state
-Push-Location $scriptDir
-if (-not (Ensure-AllVMsRunning)) {
-Write-Warning "`n[!] Vagrant was marked as done but some VMs are not running."
-Write-Host " - Re-attempting to bring them up..."
-& vagrant up
-if (-not (Ensure-AllVMsRunning)) {
-Write-Error "[!] VMs are still not running. Please fix manually and re-run the script."
-exit 1
-}
-}
 Pop-Location
 }
 
