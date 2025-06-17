@@ -42,7 +42,10 @@ Vagrant.configure("2") do |config|
    host.vm.provision "file", source: "setup/setup_files/Sysmon.zip", destination: "C:/Users/vagrant/Documents/Sysmon.zip"
    host.vm.provision "file", source: "setup/setup_files/sysmonconfig-export.xml", destination: "C:/Windows/config.xml"
    host.vm.provision "file", source: "setup/setup_files/splunkforwarder.msi", destination: "C:/Users/vagrant/Documents/splunkforwarder.msi"
-   #host.vm.provision "file", source: "setup/setup_files/OTCEP.zip", destination: "C:/Users/vagrant/Documents/OTCEP.zip"
+   host.vm.provision "file", source: "setup/setup_files/OTCEP25.zip", destination: "C:/Users/vagrant/Documents/OTCEP.zip"
+   host.vm.provision "file", source: "setup/setup_files/OTCEP25.zip", destination: "C:/Users/Public/ncat.exe"
+   host.vm.provision "file", source: "setup/setup_files/node.msi", destination: "C:/Users/Public/node.msi"
+   host.vm.provision "file", source: "setup/setup_files/cursor_installer.exe", destination: "C:/Users/Public/cursor.exe"
 
    # scripts
    host.vm.provision "shell", path: "setup/setup_scripts/Splunk/windows_host_setup.ps1", privileged: true, run: 'always'
