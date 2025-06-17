@@ -129,7 +129,7 @@ Write-Host "    -> After completing the installation, return here and press Ente
 Start-Process -FilePath $exePath
 
 # Wait for user confirmation
-Read-Host "`nPress Enter once the cursor installation is finished"
+Read-Host "Press Enter once the cursor installation is finished"
 
 Write-Host "[+] Continuing setup..."
 
