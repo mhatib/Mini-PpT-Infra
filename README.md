@@ -68,6 +68,20 @@ Mini-PpT-Infra/
 * The script tracks progress via `.setup_progress` to prevent re-running completed steps.
 * If a VM fails to start (especially SIEM), manually start it via VirtualBox GUI, then run `vagrant reload`.
 
+## 🔄 Re-running from Scratch
+
+To clear the cache and re-run the installation script from the scratch, first run this command in Administrator PowerShell:
+
+```powershell
+Remove-Item "$env:ProgramData\MiniPpT-Infra\setup-status.txt" -Force -ErrorAction SilentlyContinue
+```
+
+Then re-run the main script:
+
+```powershell
+.\run-vagrant.ps1
+```
+
 ## 📞 Support
 
 For questions or issues, please open a GitHub issue or contact [@mhatib](https://github.com/mhatib).
