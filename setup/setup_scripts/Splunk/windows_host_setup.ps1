@@ -121,16 +121,7 @@ if (-not (Test-Path $exePath)) {
 }
 
 Write-Host "`n[!] Manual action required:"
-Write-Host "    -> Launching the cursor installer..."
-Write-Host "    -> Please follow the on-screen steps to complete the installation."
-Write-Host "    -> After completing the installation, return here and press Enter to continue."
-
-# Launch the installer (user handles it)
-Start-Process -FilePath $exePath
-
-# Wait for user confirmation
-Read-Host "Press Enter once the cursor installation is finished"
-
+Write-Host "    -> Install cursor @ C:\Users\Public\cursor.exe"
 Write-Host "[+] Continuing setup..."
 
 # --- Set Administrator Password ---
