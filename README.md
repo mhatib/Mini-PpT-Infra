@@ -66,7 +66,7 @@ Mini-PpT-Infra/
 ## 🔄 Notes
 
 * The script tracks progress via `.setup_progress` to prevent re-running completed steps.
-* If a VM fails to start (especially SIEM), manually start it via VirtualBox GUI, then run `vagrant reload`.
+* If a VM fails to start (especially SIEM), delete the VM in VirtualBox GUI and run `vagrant up`
 
 ## 🔄 Re-running from Scratch
 
