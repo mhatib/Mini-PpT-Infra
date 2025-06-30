@@ -6,7 +6,7 @@ Vagrant.configure("2") do |config|
 
   # siem
   config.vm.define "siem" do |siem|
-    siem.vm.box = "hashicorp/bionic64"
+    siem.vm.box = "ubuntu/bionic64"
     siem.vm.hostname = "siem"
 
     # network

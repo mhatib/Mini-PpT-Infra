@@ -244,6 +244,11 @@ try {
     Write-Host "[+] Disabled sample submission"
 
     Write-Host "Adding Windows Defender exclusions"
+    $currentExclusions = (Get-MpPreference).ExclusionPath
+    if ($currentExclusions -contains "c:\") {
+        Remove-MpPreference -ExclusionPath "c:\"
+        Write-Host "[+] Removed 'c:\' from exclusions"
+    }
     Add-MpPreference -ExclusionPath "C:\Users\Public"
     Add-MpPreference -ExclusionPath "C:\Users\vagrant\Desktop\OTCEP25"
     Add-MpPreference -ExclusionPath "C:\Users\vagrant\AppData\Roaming\Cursor"
