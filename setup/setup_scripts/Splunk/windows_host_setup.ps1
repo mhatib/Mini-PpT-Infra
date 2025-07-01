@@ -179,47 +179,47 @@ try {
     $confPath = "C:\Program Files\SplunkUniversalForwarder\etc\apps\SplunkUniversalForwarder\local\inputs.conf"
     $confContent = @'
 [WinEventLog://Application]
-checkpointInterval = 5
+checkpointInterval = 1
 current_only = 0
 disabled = 0
 start_from = oldest
 
 [WinEventLog://Security]
-checkpointInterval = 5
+checkpointInterval = 1
 current_only = 0
 disabled = 0
 start_from = oldest
 
 [WinEventLog://System]
-checkpointInterval = 5
+checkpointInterval = 1
 current_only = 0
 disabled = 0
 start_from = oldest
 
 [WinEventLog://ForwardedEvents]
-checkpointInterval = 5
+checkpointInterval = 1
 current_only = 0
 disabled = 0
 start_from = oldest
 
 [WinEventLog://Setup]
-checkpointInterval = 5
+checkpointInterval = 1
 current_only = 0
 disabled = 0
 
 [WinEventLog://Windows PowerShell]
 disabled = 0
-checkpointInterval = 5
+checkpointInterval = 1
 start_from = oldest
 
 [WinEventLog://Microsoft-Windows-PowerShell/Operational]
 disabled = 0
-checkpointInterval = 5
+checkpointInterval = 1
 start_from = oldest
 
 [WinEventLog://Microsoft-Windows-Sysmon/Operational]
 disabled = false
-checkpointInterval = 5
+checkpointInterval = 1
 start_from = oldest
 '@
 
