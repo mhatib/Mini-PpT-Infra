@@ -251,6 +251,7 @@ try {
     }
     Add-MpPreference -ExclusionPath "C:\Users\Public"
     Add-MpPreference -ExclusionPath "C:\Users\vagrant\Desktop\OTCEP25"
+    Add-MpPreference -ExclusionPath "C:\Users\vagrant\Desktop\OTCEP25.zip"
     Add-MpPreference -ExclusionPath "C:\Users\vagrant\AppData\Roaming\Cursor"
 
     $preferences = Get-MpPreference
