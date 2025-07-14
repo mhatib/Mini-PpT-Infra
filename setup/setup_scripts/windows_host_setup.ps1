@@ -6,6 +6,14 @@ try {
     Write-Warning "Failed to add IP route: $_"
 }
 
+# --- Set Administrator Password ---
+try {
+    net user Administrator "P@ssw0rd123"
+    Write-Host "[+] Administrator password set."
+} catch {
+    Write-Warning "Failed to set Administrator password: $_"
+}
+
 # --- Set Timezone ---
 try {
     tzutil /s "Singapore Standard Time"
@@ -112,26 +120,6 @@ try {
     exit 1
 }
 
-# --- Manual Cursor Installation ---
-$exePath = "C:\Users\Public\cursor.exe"
-
-if (-not (Test-Path $exePath)) {
-    Write-Error "Cursor installer not found at $exePath"
-    exit 1
-}
-
-Write-Host "`n[!] Manual action required:"
-Write-Host "    -> Install cursor @ C:\Users\Public\cursor.exe"
-Write-Host "[+] Continuing setup..."
-
-# --- Set Administrator Password ---
-try {
-    net user Administrator "P@ssw0rd123"
-    Write-Host "[+] Administrator password set."
-} catch {
-    Write-Warning "Failed to set Administrator password: $_"
-}
-
 # --- Unzip Sysmon and Install ---
 try {
     $sysmonZip = "C:\Users\vagrant\Documents\Sysmon.zip"
@@ -152,22 +140,73 @@ try {
     $splunkPass = "password123"
     $agreeLicense = "yes"
     $serviceStartType = "auto"
+    $maxRetries = 3
+    $retryCount = 0
+    $installSuccess = $false
 
     Write-Host "Installing Splunk Universal Forwarder..."
-    msiexec.exe /i $splunkMsi `
-        RECEIVING_INDEXER=$receivingIndexer `
-        SET_ADMIN_USER=1 `
-        SPLUNKUSERNAME=$splunkUser `
-        SPLUNKPASSWORD=$splunkPass `
-        AGREETOLICENSE=$agreeLicense `
-        LAUNCHSPLUNK=1 `
-        SERVICESTARTTYPE=$serviceStartType /qn
 
-    # Wait for the service to exist
-    while (-not (Get-Service -Name "SplunkForwarder" -ErrorAction SilentlyContinue)) {
-        Write-Host "Waiting for SplunkForwarder service to be installed..."
-        Start-Sleep -Seconds 10
+    while (-not $installSuccess -and $retryCount -lt $maxRetries) {
+        $retryCount++
+        Write-Host "Attempt $retryCount of $maxRetries..."
+
+        # Check if service already exists
+        if (Get-Service -Name "SplunkForwarder" -ErrorAction SilentlyContinue) {
+            Write-Host "SplunkForwarder service already exists. Proceeding with configuration..."
+            $installSuccess = $true
+            break
+        }
+
+        # Attempt installation
+        $process = Start-Process msiexec.exe -ArgumentList "/i `"$splunkMsi`"",
+            "RECEIVING_INDEXER=$receivingIndexer",
+            "SET_ADMIN_USER=1",
+            "SPLUNKUSERNAME=$splunkUser",
+            "SPLUNKPASSWORD=$splunkPass",
+            "AGREETOLICENSE=$agreeLicense",
+            "LAUNCHSPLUNK=1",
+            "SERVICESTARTTYPE=$serviceStartType",
+            "/qn" -Wait -PassThru -NoNewWindow
+
+        # Check installation exit code
+        if ($process.ExitCode -eq 0) {
+            Write-Host "MSI installation completed successfully."
+            
+            # Wait for service to be created with timeout
+            $timeoutSeconds = 300
+            $elapsed = 0
+            $checkInterval = 10
+
+            while ($elapsed -lt $timeoutSeconds) {
+                if (Get-Service -Name "SplunkForwarder" -ErrorAction SilentlyContinue) {
+                    Write-Host "SplunkForwarder service found!"
+                    $installSuccess = $true
+                    break
+                }
+                Write-Host "Waiting for SplunkForwarder service to be installed... ($elapsed/$timeoutSeconds seconds)"
+                Start-Sleep -Seconds $checkInterval
+                $elapsed += $checkInterval
+            }
+
+            if ($installSuccess) {
+                break
+            } else {
+                Write-Warning "Service not found after $timeoutSeconds seconds."
+            }
+        } else {
+            Write-Warning "MSI installation failed with exit code: $($process.ExitCode)"
+        }
+
+        if (-not $installSuccess -and $retryCount -lt $maxRetries) {
+            Write-Host "Waiting 20 seconds before next attempt..."
+            Start-Sleep -Seconds 20
+        }
     }
+
+    if (-not $installSuccess) {
+        throw "Failed to install Splunk Universal Forwarder after $maxRetries attempts"
+    }
+
     Write-Host "[+] Splunk Universal Forwarder installed."
 } catch {
     Write-Error "Splunk installation failed: $_"
@@ -223,11 +262,61 @@ checkpointInterval = 1
 start_from = oldest
 '@
 
-    $confContent | Out-File -FilePath $confPath -Encoding ASCII -Force
-    Write-Host "[+] Splunk inputs.conf configured."
+    $maxRetries = 3
+    $retryCount = 0
+    $configSuccess = $false
+    $confDir = Split-Path -Parent $confPath
 
-    Restart-Service -Name "SplunkForwarder"
-    Write-Host "[+] Restarted SplunkForwarder service."
+    while (-not $configSuccess -and $retryCount -lt $maxRetries) {
+        $retryCount++
+        Write-Host "Configuring inputs.conf - Attempt $retryCount of $maxRetries..."
+
+        # Check if directory exists, create if not
+        if (-not (Test-Path $confDir)) {
+            Write-Host "Creating directory: $confDir"
+            New-Item -ItemType Directory -Path $confDir -Force | Out-Null
+        }
+
+        # Write the configuration
+        try {
+            $confContent | Out-File -FilePath $confPath -Encoding ASCII -Force
+            
+            # Verify the file exists and content is correct
+            if (Test-Path $confPath) {
+                $fileContent = Get-Content -Path $confPath -Raw
+                if ($fileContent -match "\[WinEventLog://Application\]" -and 
+                    $fileContent -match "\[WinEventLog://Security\]" -and
+                    $fileContent -match "\[WinEventLog://System\]") {
+                    Write-Host "[+] Splunk inputs.conf configured successfully."
+                    $configSuccess = $true
+                    
+                    # Try to restart the service
+                    try {
+                        Restart-Service -Name "SplunkForwarder"
+                        Write-Host "[+] Restarted SplunkForwarder service."
+                        break
+                    } catch {
+                        Write-Warning "Failed to restart SplunkForwarder service: $_"
+                    }
+                } else {
+                    Write-Warning "inputs.conf content verification failed."
+                }
+            } else {
+                Write-Warning "inputs.conf was not created successfully."
+            }
+        } catch {
+            Write-Warning "Failed to write inputs.conf: $_"
+        }
+
+        if (-not $configSuccess -and $retryCount -lt $maxRetries) {
+            Write-Host "Waiting 20 seconds before next attempt..."
+            Start-Sleep -Seconds 20
+        }
+    }
+
+    if (-not $configSuccess) {
+        throw "Failed to configure Splunk inputs after $maxRetries attempts"
+    }
 } catch {
     Write-Warning "Failed to configure Splunk inputs or restart service: $_"
 }
@@ -261,5 +350,23 @@ try {
     Write-Warning "Failed to configure Windows Defender settings: $_"
 }
 
+# --- Manual Cursor Installation ---
+$exePath = "C:\Users\Public\cursor.exe"
+
+if (-not (Test-Path $exePath)) {
+    Write-Error "Cursor installer not found at $exePath"
+    exit 1
+}
+
+Write-Host "`n"
+Write-Host "=================================================================="
+Write-Host "                   MANUAL ACTION REQUIRED                           "
+Write-Host "=================================================================="
+Write-Host "Please complete the following manual installation step:"
+Write-Host "1. Install Cursor IDE by running: C:\Users\Public\cursor.exe"
+Write-Host "2. Follow the installation wizard"
+Write-Host "=================================================================="
+Write-Host "`n"
+
 # --- End of Script ---
-Write-Host "Setup script completed."
+Write-Host "Setup script completed." 

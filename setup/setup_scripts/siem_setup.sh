@@ -46,4 +46,4 @@ EOM
 /opt/splunk/bin/splunk install app sysmonaddon.tgz -update 1 -auth admin:password123
 systemctl daemon-reload
 systemctl enable start.service
-systemctl start start.service
+systemctl start start.service 

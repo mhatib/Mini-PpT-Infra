@@ -16,7 +16,7 @@ Vagrant.configure("2") do |config|
     # scripts 
     siem.vm.provision "file", source: "setup/setup_files/splunk.deb", destination: "/home/vagrant/splunk.deb"
     siem.vm.provision "file", source: "setup/setup_files/sysmonaddon.tgz", destination: "/home/vagrant/sysmonaddon.tgz"
-    siem.vm.provision "shell", path: "setup/setup_scripts/Splunk/siem_setup.sh", privileged: true
+    siem.vm.provision "shell", path: "setup/setup_scripts/siem_setup.sh", privileged: true
 
     # virtualise
     siem.vm.provider "virtualbox" do |v, override|
@@ -49,7 +49,7 @@ Vagrant.configure("2") do |config|
    host.vm.provision "file", source: "setup/setup_files/cursor_installer.exe", destination: "C:/Users/Public/cursor.exe"
 
    # scripts
-   host.vm.provision "shell", path: "setup/setup_scripts/Splunk/windows_host_setup.ps1", privileged: true, run: 'always'
+   host.vm.provision "shell", path: "setup/setup_scripts/windows_host_setup.ps1", privileged: true, run: 'always'
 
    # virtualise
    host.vm.provider "virtualbox" do |v, override|
