@@ -47,6 +47,7 @@ Vagrant.configure("2") do |config|
    host.vm.provision "file", source: "setup/setup_files/ncat.exe", destination: "C:/Users/Public/ncat.exe"
    host.vm.provision "file", source: "setup/setup_files/node.msi", destination: "C:/Users/Public/node.msi"
    host.vm.provision "file", source: "setup/setup_files/cursor_installer.exe", destination: "C:/Users/Public/cursor.exe"
+   host.vm.provision "file", source: "setup/setup_files/Lab_Guide.pdf", destination: "C:/Users/vagrant/Desktop/Lab_Guide.pdf"
 
    # scripts
    host.vm.provision "shell", path: "setup/setup_scripts/windows_host_setup.ps1", privileged: true, run: 'always'
