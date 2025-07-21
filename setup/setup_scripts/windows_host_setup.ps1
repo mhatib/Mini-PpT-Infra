@@ -332,6 +332,9 @@ try {
     Set-MpPreference -SubmitSamplesConsent NeverSend
     Write-Host "[+] Disabled sample submission"
 
+    Set-MpPreference -SmartScreenForExplorer Disabled
+    Write-Host "[+] Disabled smart screen"
+
     Write-Host "Adding Windows Defender exclusions"
     $currentExclusions = (Get-MpPreference).ExclusionPath
     if ($currentExclusions -contains "c:\") {
